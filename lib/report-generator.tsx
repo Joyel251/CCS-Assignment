@@ -67,7 +67,7 @@ export function generateCSVReport(data: any): string {
     stat.opsPerSecond,
   ])
 
-  const csv = [headers.join(","), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(","))].join("\n")
+  const csv = [headers.join(","), ...rows.map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(","))].join("\n")
 
   return csv
 }

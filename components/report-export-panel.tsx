@@ -23,7 +23,7 @@ interface ReportExportPanelProps {
     p95Time: number
     p99Time: number
     avgMemory: number
-    opsPerSecond: string
+    opsPerSecond: number
   }>
 }
 

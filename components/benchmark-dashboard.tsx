@@ -74,7 +74,7 @@ export default function BenchmarkDashboard({ results, loading, progress }: Bench
       p95Time: sorted[Math.floor(sorted.length * 0.95)],
       p99Time: sorted[Math.floor(sorted.length * 0.99)],
       avgMemory: data.memories.reduce((a: number, b: number) => a + b) / data.memories.length,
-      opsPerSecond: (1000 / avg).toFixed(2),
+      opsPerSecond: Number((1000 / avg).toFixed(2)),
       rawMetrics: data.metrics,
     }
   })

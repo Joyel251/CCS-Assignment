@@ -9,7 +9,7 @@ interface PerformanceMetricsProps {
     minTime: number
     maxTime: number
     avgMemory: number
-    opsPerSecond: string
+    opsPerSecond: number
   }>
 }
 
@@ -49,7 +49,7 @@ export function PerformanceMetrics({ stats }: PerformanceMetricsProps) {
             <div className="h-2 bg-border rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-chart-1 to-chart-2"
-                style={{ width: `${Math.min(100, (1000 / Number.parseFloat(stat.avgTime)) * 10)}%` }}
+                style={{ width: `${Math.min(100, (1000 / stat.avgTime) * 10)}%` }}
               />
             </div>
           </div>

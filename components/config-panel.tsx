@@ -29,7 +29,7 @@ export default function ConfigPanel({ onRunBenchmark, loading }: ConfigPanelProp
   const handleAlgorithmToggle = (algo: string) => {
     setAlgorithmSelection((prev) => ({
       ...prev,
-      [algo]: !prev[algo],
+      [algo]: !prev[algo as keyof typeof prev],
     }))
   }
 

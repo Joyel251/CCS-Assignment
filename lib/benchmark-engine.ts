@@ -80,7 +80,8 @@ async function runED25519Benchmark(
   }
 
   for (let i = 0; i < iterations; i++) {
-    const data = await generateDataFromInput(userInput, dataSize)
+    const dataTemp = await generateDataFromInput(userInput, dataSize)
+    const data = new Uint8Array(dataTemp)
 
     // Generate keypair
     const startKey = performance.now()
@@ -148,7 +149,8 @@ async function runECDSABenchmark(
   }
 
   for (let i = 0; i < iterations; i++) {
-    const data = await generateDataFromInput(userInput, dataSize)
+    const dataTemp = await generateDataFromInput(userInput, dataSize)
+    const data = new Uint8Array(dataTemp)
 
     // Generate keypair
     const startKey = performance.now()
