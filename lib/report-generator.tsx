@@ -92,6 +92,18 @@ export async function generatePDFReport(data: any): Promise<void> {
   // Dynamically import html2pdf only on the client side
   const html2pdf = (await import("html2pdf.js")).default
 
+  // Capture charts as images
+  const captureChartImage = (chartId: string): string => {
+    const chartElement = document.querySelector(`[data-chart-id="${chartId}"]`)
+    if (chartElement) {
+      const canvas = chartElement.querySelector('canvas')
+      if (canvas) {
+        return canvas.toDataURL('image/png')
+      }
+    }
+    return ''
+  }
+
   const html = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333;">
       <h1 style="text-align: center; color: #1a1a1a; margin-bottom: 10px; font-size: 28px;">
@@ -188,9 +200,90 @@ export async function generatePDFReport(data: any): Promise<void> {
           .join("")}
       </div>
 
+      <div style="page-break-inside: avoid; margin-bottom: 30px;">
+        <h2 style="color: #2563eb; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">
+          Performance Comparison Charts
+        </h2>
+        
+        <!-- Average Time Comparison -->
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #1a1a1a; font-size: 16px; margin-bottom: 15px;">Average Execution Time</h3>
+          ${data.stats
+            .map((stat: any) => {
+              const maxTime = Math.max(...data.stats.map((s: any) => s.avgTime))
+              const width = (stat.avgTime / maxTime) * 100
+              const color = stat.algorithm === "ED25519" ? "#3b82f6" : "#10b981"
+              return `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: 600; font-size: 14px;">${stat.algorithm}</span>
+                    <span style="font-family: monospace; font-size: 14px;">${stat.avgTime.toFixed(2)} ms</span>
+                  </div>
+                  <div style="width: 100%; height: 30px; background-color: #f3f4f6; border-radius: 4px; overflow: hidden;">
+                    <div style="width: ${width}%; height: 100%; background-color: ${color}; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-size: 12px; font-weight: 600;">
+                      ${width.toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              `
+            })
+            .join("")}
+        </div>
+
+        <!-- Operations Per Second Comparison -->
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #1a1a1a; font-size: 16px; margin-bottom: 15px;">Operations Per Second</h3>
+          ${data.stats
+            .map((stat: any) => {
+              const maxOps = Math.max(...data.stats.map((s: any) => parseFloat(s.opsPerSecond)))
+              const width = (parseFloat(stat.opsPerSecond) / maxOps) * 100
+              const color = stat.algorithm === "ED25519" ? "#8b5cf6" : "#f59e0b"
+              return `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: 600; font-size: 14px;">${stat.algorithm}</span>
+                    <span style="font-family: monospace; font-size: 14px;">${stat.opsPerSecond} ops/s</span>
+                  </div>
+                  <div style="width: 100%; height: 30px; background-color: #f3f4f6; border-radius: 4px; overflow: hidden;">
+                    <div style="width: ${width}%; height: 100%; background-color: ${color}; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-size: 12px; font-weight: 600;">
+                      ${width.toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              `
+            })
+            .join("")}
+        </div>
+
+        <!-- Memory Usage Comparison -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #1a1a1a; font-size: 16px; margin-bottom: 15px;">Average Memory Usage</h3>
+          ${data.stats
+            .map((stat: any) => {
+              const maxMem = Math.max(...data.stats.map((s: any) => s.avgMemory))
+              const width = (stat.avgMemory / maxMem) * 100
+              const color = stat.algorithm === "ED25519" ? "#ec4899" : "#06b6d4"
+              return `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: 600; font-size: 14px;">${stat.algorithm}</span>
+                    <span style="font-family: monospace; font-size: 14px;">${stat.avgMemory.toFixed(4)} MB</span>
+                  </div>
+                  <div style="width: 100%; height: 30px; background-color: #f3f4f6; border-radius: 4px; overflow: hidden;">
+                    <div style="width: ${width}%; height: 100%; background-color: ${color}; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-size: 12px; font-weight: 600;">
+                      ${width.toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              `
+            })
+            .join("")}
+        </div>
+      </div>
+
       <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 12px; color: #666;">
-        <p style="margin: 0;">This report was automatically generated by the Cryptographic Performance Benchmark Tool.</p>
-        <p style="margin: 5px 0 0 0;">For more information, visit the algorithm documentation links provided in the tool.</p>
+        <p style="margin: 0;">This report was automatically generated by the Crypto Benchmark Tool.</p>
+        <p style="margin: 5px 0 0 0;">Performance benchmarks for ED25519 and ECDSA cryptographic algorithms.</p>
       </div>
     </div>
   `
